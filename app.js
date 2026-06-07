@@ -4,11 +4,14 @@ const mongoose = require("mongoose");
 const Listing = require("./models/listings.js");
 const path = require("path");
 const methodOverride = require("method-override");
+const ejsMate = require("ejs-mate");
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
 app.use(express.urlencoded({extended : true}));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(methodOverride('_method'));
+app.engine("ejs", ejsMate);
+app.use(express.static(path.join(__dirname, "/public")));
 
 app.listen(8080, ()=>{
     console.log("listening to port 8080");
@@ -27,6 +30,7 @@ async function main() {
 
 app.get("/", (req, res)=>{
     console.log("home directory is working!");
+    res.send("home directory");
 });
 
 //index route(view)

@@ -1,20 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WanderLust - Edit your Listing</title>
-</head>
-<body>
-    <h2>Edit Listing</h2>
-    <form method="POST" action="/listings/<%= listing._id %>?_method=PUT">
-        <input name="title" value="<%= listing.title%>" type="text">    <br><br>
-        <textarea name="description" type="text"> <%=listing.description%> </textarea>  <br><br>
-        <input name="price" value=<%= listing.price%> type="number">    <br><br>
-        <input name="image" value="<%= listing.image%>" type="text">  <br><br>
-        <input name="location" value="<%= listing.location%>" type="text">  <br><br>
-        <input name="country" value="<%= listing.country%>" type="text">  <br><br>
-        <button>Submit</button>
-    </form>
-</body>
-</html>
+<% layout("layouts/boilerplate.ejs") %>
+
+<div class="row">
+    <div class="col-8 offset-2 mt-3">
+        <h2>Edit Listing</h2>
+        <form method="POST" action="/listings/<%= listing._id %>?_method=PUT">
+
+            <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                <input class="form-control" name="title" value="<%= listing.title%>" type="text">
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea name="description" class="form-control" type="text" required><%=listing.description%></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="image" class="form-label">Image Link</label>
+                <input name="image" type="text" value="<%= listing.image%>" class="form-control" required>
+            </div>
+
+            <div class="row"> <div class="mb-3 col-md-4">
+                    <label for="price" class="form-label">Price</label>
+                    <input name="price" value="<%= listing.price %>" type="number" class="form-control" required>
+                </div>
+                <div class="mb-3 col-md-8">
+                    <label for="country" class="form-label">Country</label>
+                    <input name="country" value="<%= listing.country%>" type="text" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input name="location" value="<%= listing.location%>" type="text" class="form-control" required>
+            </div>
+
+            <button class="btn btn-dark">Submit</button>
+            <a href="/listings/<%= listing._id %>" class="btn btn-light">Cancel</a>
+
+        </form>
+    </div>
+</div>
