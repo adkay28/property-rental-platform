@@ -2,12 +2,13 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const Listing = require("./models/listings.js");
+const Review = require("./models/reviews.js");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
-const { listingSchema } = require("./schema.js");
+const { listingSchema } = require("./schema.js"); //validation
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
@@ -136,6 +137,21 @@ app.delete(
     res.redirect("/listings");
   }),
 );
+
+//add review
+app.post("/listings/:id/reviews", async (req, res) => {
+  let { id } = req.params;
+  let { body, rating } = req.body;
+  const newReview = new Review({
+    body: body,
+    rating: rating,
+  });
+  await newReview.save();
+  let currListing = await Listing.findById(id);
+  currListing.reviews.push(newReview);
+  await currListing.save();
+  res.redirect("/listings/:id");
+});
 
 //for all other routes : send 404 error
 app.use((req, res, next) => {
