@@ -7,7 +7,7 @@
       <div class="mb-3">
         <label for="title" class="form-label">Title*</label>
         <input
-          name="title"
+          name="listing[title]"
           placeholder="Add title"
           type="text"
           class="form-control"
@@ -18,14 +18,18 @@
 
       <div class="mb-3">
         <label for="description" class="form-label">Description*</label>
-        <textarea name="description" class="form-control" required></textarea>
+        <textarea
+          name="listing[description]"
+          class="form-control"
+          required
+        ></textarea>
         <div class="invalid-feedback">Please enter a short description</div>
       </div>
 
       <div class="mb-3">
         <label for="image" class="form-label">Image Link</label>
         <input
-          name="image"
+          name="listing[image]"
           placeholder="Enter image URL"
           type="text"
           class="form-control"
@@ -35,26 +39,31 @@
       <div class="row">
         <div class="mb-3 col-md-4">
           <label for="price" class="form-label">Price*</label>
-          <input name="price" type="number" class="form-control" required />
+          <input
+            name="listing[price]"
+            type="number"
+            class="form-control"
+            required
+          />
           <div class="invalid-feedback">Please enter valid price</div>
         </div>
         <div class="mb-3 col-md-8">
           <label for="country" class="form-label">Country*</label>
           <input
-            name="country"
+            name="listing[country]"
             placeholder="Enter Country"
             type="text"
             class="form-control"
             required
           />
-          <div class="invalid-feedback">Pleas enter valid country name</div>
+          <div class="invalid-feedback">Please enter valid country name</div>
         </div>
       </div>
 
       <div class="mb-3">
         <label for="location" class="form-label">Location*</label>
         <input
-          name="location"
+          name="listing[location]"
           placeholder="Enter Location (City, State)"
           type="text"
           class="form-control"

@@ -8,7 +8,7 @@ const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
-const { listingSchema } = require("./schema.js"); //validation
+const { listingSchema, reviewSchema } = require("./schema.js"); //validation
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
@@ -32,7 +32,19 @@ async function main() {
 const validateListing = (req, res, next) => {
   let { error } = listingSchema.validate(req.body);
   if (error) {
-    throw new ExpressError(400, error);
+    let errMsg = error.details.map((el) => el.message).join(",");
+    throw new ExpressError(400, errMsg);
+  } else {
+    next();
+  }
+};
+
+const validateReview = (req, res, next) => {
+  let { error } = reviewSchema.validate(req.body);
+  if (error) {
+    console.log(error.details);
+    let errMsg = error.details.map((el) => el.message).join(",");
+    throw new ExpressError(400, errMsg);
   } else {
     next();
   }
@@ -62,11 +74,10 @@ app.get(
   "/listings/:id",
   wrapAsync(async (req, res, next) => {
     let { id } = req.params;
-    let listing = await Listing.findById(id);
+    let listing = await Listing.findById(id).populate("reviews");
     if (!listing) {
-      next(new ExpressError(400, "enter valid ID"));
+      return next(new ExpressError(400, "enter valid ID"));
     }
-    console.log(listing);
     res.render("listings/show.ejs", { listing });
   }),
 );
@@ -76,20 +87,7 @@ app.post(
   "/listings",
   validateListing,
   wrapAsync(async (req, res, next) => {
-    let result = listingSchema.validate(req.body);
-    console.log(result);
-    if (result.error) {
-      throw new ExpressError(400, result.error);
-    }
-    let { title, description, price, image, location, country } = req.body;
-    const newListing = new Listing({
-      title: title,
-      description: description,
-      price: price,
-      image: image,
-      location: location,
-      country: country,
-    });
+    const newListing = new Listing(req.body.listing);
     //another way:
     //const newListing = new Listing(req.body.listing);
     console.log(newListing);
@@ -139,19 +137,35 @@ app.delete(
 );
 
 //add review
-app.post("/listings/:id/reviews", async (req, res) => {
-  let { id } = req.params;
-  let { body, rating } = req.body;
-  const newReview = new Review({
-    body: body,
-    rating: rating,
-  });
-  await newReview.save();
-  let currListing = await Listing.findById(id);
-  currListing.reviews.push(newReview);
-  await currListing.save();
-  res.redirect("/listings/:id");
-});
+app.post(
+  "/listings/:id/reviews",
+  validateReview,
+  wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    let { body, rating } = req.body.review;
+    console.log(body, rating);
+    const newReview = new Review({
+      body: body,
+      rating: rating,
+    });
+    await newReview.save();
+    let currListing = await Listing.findById(id);
+    currListing.reviews.push(newReview);
+    await currListing.save();
+    res.redirect(`/listings/${id}`);
+  }),
+);
+
+//delete review
+app.delete(
+  "/listings/:id/reviews/:reviewId",
+  wrapAsync(async (req, res) => {
+    let { id, reviewId } = req.params;
+    await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/listings/${id}`);
+  }),
+);
 
 //for all other routes : send 404 error
 app.use((req, res, next) => {
