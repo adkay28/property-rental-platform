@@ -2,27 +2,26 @@
 
 > Work in Progress
 
-A full-stack web application that allows users to view, create, edit, and delete property rental listings.
+A full-stack web application that allows users to view, create, edit, and delete property rental listings, with support for user-generated reviews.
 
 ## Tech Stack
 
 * **Backend:** Node.js, Express.js
 * **Database:** MongoDB, Mongoose
-* **Validation:** Joi(Server-side)
-* **Frontend:** EJS(Embedded JavaScript), HTML5, Bootstrap
+* **Validation:** Joi (Server-side)
+* **Frontend:** EJS (Embedded JavaScript), HTML5, Bootstrap
 * **Routing:** RESTful API architecture
 
 ## Current Features
 
 ### Key Features
-* **View Listings:** Search the full database of rental properties with pictures, descriptions and pricing.
-* **Detailed Views:** Click on individual properties to see their detailed information.
-* **Create:** Add new properties to the database using an interactive form.
-* **Update:** Edit existing property details dynamically.
-* **Delete:** Remove properties from the database completely.
+* **Listings Management:** View, create, update, and delete property listings with image support.
+* **Reviews System:** Users can submit ratings and reviews for any listing.
+* **Cascading Deletes:** When a property listing is deleted, the server deletes all associated reviews.
+* **One-to-Many Relationships:** Used Mongoose ObjectId references to link reviews directly to the specific listings.
 
-### Security & Reliability
-* **Client-Side Validation:** Form inputs are validated on the browser with Bootstrap’s custom validation styles to ensure required data is present before submitting.
-* **Server-Side Validation:**  Any incoming HTTP request is validated with Joi before it reaches the database.
-* **Asynchronous Error Handling:** Wrap all database operations with wrapAsync to ensure the server does not crash.
-* **Custom Error Routing:** Send the users a custom styled error page for both database errors and invalid route requests.
+### Security
+* **Client-Side Validation:** Form inputs are validated in the browser using Bootstrap’s custom validation styles.
+* **Server-Side Validation:** All incoming HTTP requests are validated using Joi schemas.
+* **Asynchronous Safety:** Used `wrapAsync` globally to manage errors in asynchronous database operations.
+* **Custom Error Routing:** Error handler serves EJS error pages for database failures or invalid route requests.
