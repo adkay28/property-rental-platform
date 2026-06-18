@@ -10,7 +10,7 @@ A full-stack web application that allows users to view, create, edit, and delete
 * **Database:** MongoDB, Mongoose
 * **Validation:** Joi (Server-side)
 * **Frontend:** EJS (Embedded JavaScript), HTML5, Bootstrap
-* **Routing:** RESTful API architecture
+* **Routing:** Express Router
 
 ## Current Features
 
@@ -19,6 +19,7 @@ A full-stack web application that allows users to view, create, edit, and delete
 * **Reviews System:** Users can submit ratings and reviews for any listing.
 * **Cascading Deletes:** When a property listing is deleted, the server deletes all associated reviews.
 * **One-to-Many Relationships:** Used Mongoose ObjectId references to link reviews directly to the specific listings.
+* **Response Alerts:** Used connect-flash and express-session to create alerts for CRUD operations.
 
 ### Security
 * **Client-Side Validation:** Form inputs are validated in the browser using Bootstrap’s custom validation styles.
