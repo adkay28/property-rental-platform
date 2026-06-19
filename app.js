@@ -9,10 +9,14 @@ const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
 const { listingSchema, reviewSchema } = require("./schema.js"); //validation
-const listings = require("./routes/listing.js");
-const reviews = require("./routes/review.js");
+const listingsRouter = require("./routes/listing.js");
+const reviewsRouter = require("./routes/review.js");
 const flash = require("connect-flash");
 const session = require("express-session");
+const passport = require("passport");
+const localStrategy = require("passport-local").Strategy;
+const User = require("./models/user.js");
+const usersRouter = require("./routes/user.js");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
@@ -46,10 +50,26 @@ const sessionOptions = {
 app.use(session(sessionOptions));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   next();
+});
+
+app.get("/demouser", async (req, res) => {
+  let newUser = new User({
+    email: "student@gmail.com",
+    username: "student1",
+  });
+  let registeredUser = await User.register(newUser, "passwordgoeshere");
+  console.log(registeredUser);
+  res.send(registeredUser);
 });
 
 app.get("/", (req, res) => {
@@ -57,9 +77,9 @@ app.get("/", (req, res) => {
   res.send("home directory");
 });
 
-app.use("/listings", listings); //for all listing requests
-
-app.use("/listings/:id/reviews", reviews); //for all review requests
+app.use("/listings", listingsRouter); //for all listing requests
+app.use("/listings/:id/reviews", reviewsRouter); //for all review requests
+app.use("/", usersRouter);
 
 //for all other routes : send 404 error
 app.use((req, res, next) => {
