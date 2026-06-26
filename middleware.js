@@ -61,4 +61,11 @@ isReviewAuthor = async (req, res, next) => {
   next();
 };
 
-module.exports = { isLoggedIn, saveOrgUrl, isOwner, validateListing, validateReview, isReviewAuthor };
+module.exports = {
+  isLoggedIn,
+  saveOrgUrl,
+  isOwner,
+  validateListing,
+  validateReview,
+  isReviewAuthor,
+};

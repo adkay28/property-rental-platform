@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV != "production") {
+  require("dotenv").config();
+}
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -13,6 +17,7 @@ const listingsRouter = require("./routes/listing.js");
 const reviewsRouter = require("./routes/review.js");
 const flash = require("connect-flash");
 const session = require("express-session");
+const mongoStore = require("connect-mongo");
 const passport = require("passport");
 const localStrategy = require("passport-local").Strategy;
 const User = require("./models/user.js");
@@ -24,7 +29,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
-app.use(express.static(path.join(__dirname, "/public")));
 
 main()
   .then(() => {
@@ -34,11 +38,21 @@ main()
     console.log(err);
   });
 async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/wanderlust");
+  await mongoose.connect(process.env.ATLASDB_URL);
 }
 
+const store = mongoStore.create({
+  mongoUrl: process.env.ATLASDB_URL,
+  touchAfter: 24 * 60 * 60,
+});
+
+store.on("error", (err) => {
+  console.log("error in mongo session store", err);
+});
+
 const sessionOptions = {
-  secret: "secretcodeforserverjs",
+  store: store,
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -47,6 +61,7 @@ const sessionOptions = {
     httpOnly: true,
   },
 };
+
 app.use(session(sessionOptions));
 app.use(flash());
 
@@ -64,8 +79,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (req, res) => {
-  console.log("home directory is working!");
-  res.send("home directory");
+  return res.render("homepage.ejs");
 });
 
 app.use("/listings", listingsRouter); //for all listing requests
@@ -78,10 +92,13 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log("CRASH DETECTED:", err);
   let { status = 500, message = "something went wrong" } = err;
+  const displayMessage =
+    typeof message === "object" ? JSON.stringify(message) : message;
   res.status(status).render("listings/error.ejs", { message });
 });
 
-app.listen(8080, () => {
-  console.log("listening to port 8080");
+app.listen(process.env.PORT || 8080, () => {
+  console.log("listening to port");
 });
